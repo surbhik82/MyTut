@@ -1,0 +1,19 @@
+select reportdate, devicemodel, Sum(au7_radio) as Weekly_au7_device from kpi.au7_radio_device
+where reportdate >= cast( current_date - 30 as date)
+--group by territorykey, platformkey
+and date_part('weekday', reportdate)=5
+--and client in ( 'TizenRadio', 'Samsung Preload on Android', 'HK Controller for iOS', 'HK Controller for Android', 'Plex')
+and platformkey = 10
+--and territorykey = 174
+group by 1,2
+order by 1 desc;
+
+select reportdate, devicemodel, Sum(au30_radio) as monthly_au30_device from kpi.au30_radio_device 
+where reportdate >= cast( current_date - 91 as timestamp)
+and date_part('day', reportdate)=30
+--and client in ( 'TizenRadio', 'Samsung Preload on Android', 'HK Controller for iOS', 'HK Controller for Android', 'Plex')
+and platformkey = 10
+--and territorykey = 174
+--and lower(rd.devicemodel) like '%samsung%'
+group by 1, 2
+order by 1 desc;
