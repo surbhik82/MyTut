@@ -1,0 +1,15 @@
+Select a.client, a.clienttype, count( distinct a.userid)
+
+from analytics.tracks a
+
+--where platformkey in ( '7', '8', '10')
+
+where client in ( 'TizenRadio', 'Samsung Preload on Android', 'HK Controller for Android', 'HK Controller for iOS', 'Plex')
+
+--and a.receivetime between convert( datetime '2015-08-31') and current_date
+
+and a.receivetime >= (current_date - timestamp '2015-08-31')
+
+group by 1,2
+
+order by 3 desc

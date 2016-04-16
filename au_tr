@@ -1,0 +1,41 @@
+//Active Users from Aggregate Table
+
+select au.reportdate, au.date_added, au.devicemodel, au.manufacturer, au.client, au.Weekly_au7_device, au.monthly_au30_device, au.weekly_new_user, au.total_user
+from
+(
+select reportdate, cast(null as date_added), devicemodel, manufacturer, null as client, Sum(au7_radio) as Weekly_au7_device, null as monthly_au30_device, null as weekly_new_user, null as total_user from kpi.au7_radio_device
+where reportdate > cast( current_date - 30 as timestamp)
+and date_part( 'weekday', reportdate)=5
+and platformkey = 10
+--and territorykey = 174
+group by 1,3,4,2,5
+--order by reportdate desc
+
+union all
+
+select reportdate, cast( null as date_added), devicemodel, manufacturer, null as client, null as weekly_au7_device, Sum(au30_radio) as monthly_au30_device, null as weekly_new_user, null as toatal_user  from kpi.au30_radio_device 
+where reportdate >= cast( current_date - 61 as timestamp)
+and date_part('day', reportdate)=30
+and platformkey = 10
+--and territorykey = 174
+group by 1,3,4,2,5
+--order by 1 desc
+
+union all
+
+select cast(null as reportdate), date_added, null as devicemodel, null as manufacturer, client, null as weekly_au7_device, null as monthly_au30_device, count(distinct c_uniqueid) as weekly_new_user, null as total_user from kpi.all_users_firstseen
+where date_added >= cast( current_date - 30 as timestamp)
+and date_part('weekday', date_added)=5
+and platformkey = 10
+group by 2,5,1,3,4
+
+union all
+
+select cast(null as reportdate), date_added, null as devicemodel, null as manufacturer, client, null as weekly_au7_device, null as monthly_au30_device, null as weekly_new_user, count(distinct c_uniqueid) as total_user from kpi.all_users_firstseen
+where client = 'TizenRadio'
+group by 2,5,1,3,4
+)au
+--group by 1, 2, 3
+order by 1 desc;
+
+
